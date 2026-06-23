@@ -166,6 +166,22 @@ Borrado lógico (`deleted=true` + `deleted_at`). El tombstone viaja como cualqui
 cambio para que el borrado se propague a todos los miembros. Purga física en el
 servidor tras una ventana de retención (p. ej. 90 días).
 
+**Política `ON DELETE` de las claves foráneas (decisión explícita en V1):**
+El día a día nunca borra físicamente (solo `deleted=true`), pero la purga futura sí
+elimina filas padre. Para que esa purga funcione sin orquestación manual y sin perder
+datos que deben preservarse, los FK definen:
+- **CASCADE** en los datos operativos que cuelgan de un perfil y no tienen existencia
+  propia: `profile_memberships`, `medications` → `medication_schedules` → `dose_logs`,
+  `appointments`, `notes`, `share_codes`. Al purgar un perfil, su árbol operativo se
+  limpia en cascada.
+- **RESTRICT** en `audit_logs` (FK a perfil y a usuario): la traza es append-only e
+  inmutable (§8); nunca se borra en cascada. La purga de un perfil con auditoría debe
+  tratar esa traza de forma explícita.
+- **RESTRICT** en los FK hacia `users` (`owner_user_id`, `logged_by_user_id`,
+  `actor_user_id`): un usuario no arrastra en cascada datos de perfiles.
+- **SET NULL** en `notes.linked_appointment_id`: si se purga una cita, la nota se
+  conserva y solo se desvincula la referencia obsoleta.
+
 ### 5.6 Limitación conocida (honestidad de ingeniería)
 Última-escritura-gana descarta el cambio perdedor a nivel de **registro completo**:
 si dos cuidadores editan campos distintos del mismo medicamento offline, gana uno

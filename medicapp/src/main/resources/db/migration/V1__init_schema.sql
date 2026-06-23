@@ -51,7 +51,7 @@ CREATE TABLE treatment_profiles (
     INDEX idx_treatment_profiles_server_seq (server_seq),
     INDEX idx_treatment_profiles_owner (owner_user_id),
     CONSTRAINT fk_treatment_profiles_owner_user
-        FOREIGN KEY (owner_user_id) REFERENCES users (id)
+        FOREIGN KEY (owner_user_id) REFERENCES users (id) ON DELETE RESTRICT
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -73,9 +73,9 @@ CREATE TABLE profile_memberships (
     INDEX idx_profile_memberships_server_seq (server_seq),
     INDEX idx_profile_memberships_profile_seq (profile_id, server_seq),
     CONSTRAINT fk_profile_memberships_profile
-        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id),
+        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id) ON DELETE CASCADE,
     CONSTRAINT fk_profile_memberships_user
-        FOREIGN KEY (user_id) REFERENCES users (id)
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -100,7 +100,7 @@ CREATE TABLE medications (
     INDEX idx_medications_server_seq (server_seq),
     INDEX idx_medications_profile_seq (profile_id, server_seq),
     CONSTRAINT fk_medications_profile
-        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id)
+        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -124,7 +124,7 @@ CREATE TABLE medication_schedules (
     INDEX idx_medication_schedules_server_seq (server_seq),
     INDEX idx_medication_schedules_profile_seq (medication_id, server_seq),
     CONSTRAINT fk_medication_schedules_medication
-        FOREIGN KEY (medication_id) REFERENCES medications (id)
+        FOREIGN KEY (medication_id) REFERENCES medications (id) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -150,9 +150,9 @@ CREATE TABLE dose_logs (
     INDEX idx_dose_logs_server_seq (server_seq),
     INDEX idx_dose_logs_schedule_id (schedule_id),
     CONSTRAINT fk_dose_logs_schedule
-        FOREIGN KEY (schedule_id) REFERENCES medication_schedules (id),
+        FOREIGN KEY (schedule_id) REFERENCES medication_schedules (id) ON DELETE CASCADE,
     CONSTRAINT fk_dose_logs_logged_by_user
-        FOREIGN KEY (logged_by_user_id) REFERENCES users (id)
+        FOREIGN KEY (logged_by_user_id) REFERENCES users (id) ON DELETE RESTRICT
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -177,7 +177,7 @@ CREATE TABLE appointments (
     INDEX idx_appointments_server_seq (server_seq),
     INDEX idx_appointments_profile_seq (profile_id, server_seq),
     CONSTRAINT fk_appointments_profile
-        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id)
+        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -200,9 +200,9 @@ CREATE TABLE notes (
     INDEX idx_notes_server_seq (server_seq),
     INDEX idx_notes_profile_seq (profile_id, server_seq),
     CONSTRAINT fk_notes_profile
-        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id),
+        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id) ON DELETE CASCADE,
     CONSTRAINT fk_notes_linked_appointment
-        FOREIGN KEY (linked_appointment_id) REFERENCES appointments (id)
+        FOREIGN KEY (linked_appointment_id) REFERENCES appointments (id) ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -226,7 +226,7 @@ CREATE TABLE share_codes (
     INDEX idx_share_codes_profile_seq (profile_id, server_seq),
     INDEX idx_share_codes_code (code),
     CONSTRAINT fk_share_codes_profile
-        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id)
+        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -254,8 +254,8 @@ CREATE TABLE audit_logs (
     INDEX idx_audit_logs_server_seq (server_seq),
     INDEX idx_audit_logs_profile_seq (profile_id, server_seq),
     CONSTRAINT fk_audit_logs_profile
-        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id),
+        FOREIGN KEY (profile_id) REFERENCES treatment_profiles (id) ON DELETE RESTRICT,
     CONSTRAINT fk_audit_logs_actor_user
-        FOREIGN KEY (actor_user_id) REFERENCES users (id)
+        FOREIGN KEY (actor_user_id) REFERENCES users (id) ON DELETE RESTRICT
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
