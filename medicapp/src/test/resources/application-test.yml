@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: medicapp
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+# Datasource is not statically configured here: future test infrastructure
+# (Testcontainers @ServiceConnection, or a static compose datasource) will
+# inject it. No SQL migrations or entities exist yet in this slice.
